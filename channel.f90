@@ -42,14 +42,7 @@ PROGRAM channel
 #endif
   CALL setup_derivatives()
   CALL setup_boundary_conditions()
-#ifdef runtimestats
-  call runtime_setup()
-#endif
-  fname="Dati.cart.out"
-#ifdef runtimestats
-  if (runtime_read_field_from_idx) fname="Dati.cart."//TRIM(ADJUSTL(rt_tgt_istr))//".out"
-#endif
-  CALL read_restart_file(fname,V)
+  fname="Dati.cart.out";       CALL read_restart_file(fname,V)
   ! move cursor to desired record
   IF (time_from_restart .AND. rtd_exists) THEN
     CALL get_record(time)
@@ -88,6 +81,9 @@ IF (has_terminal) THEN
 #endif
   WRITE(*,*) " "
 END IF
+#ifdef runtimestats
+  call runtime_setup()
+#endif
 #ifdef bodyforce
   call config_body_force()
 #endif
@@ -166,11 +162,7 @@ END IF
     ! Write runtime file
     CALL outstats()
 #ifdef runtimestats
-    IF (rtstats_savenow) THEN
-      IF (has_terminal) print *, "Saving runtime stats at time", time
-      CALL runtime_save()
-      rtstats_savenow = .FALSE.
-    END IF
+    call runtime_save()
 #endif
 #ifdef chron
     CALL CPU_TIME(timee)
@@ -179,9 +171,13 @@ END IF
   END DO timeloop
   IF (has_terminal) WRITE(*,*) "End of time/iterations loop: writing restart file at time ", time
   end_filename="Dati.cart.out";  CALL save_restart_file(end_filename,V)
+#ifdef bodyforce
+  IF (has_terminal) WRITE(*,*) "End of time/iterations loop: writing force field at time ", time
+  end_filename="Force.cart.out"; CALL save_restart_file(end_filename,F)
+#endif
 #ifdef ibm
   IF (has_terminal) WRITE(*,*) "End of time/iterations loop: writing dUint.cart.out at time ", time
-  filename="dUint.cart.out"; CALL save_body_file(filename,dUint(:,:,:,:,0))
+  end_filename="dUint.cart.out"; CALL save_body_file(end_filename,dUint(:,:,:,:,0))
 #endif
   IF (has_terminal) CLOSE(102)
   ! Realease memory

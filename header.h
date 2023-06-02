@@ -10,7 +10,7 @@
 ! only if the program is NOT uiuj_*
 ! (uiuj does not support nonblocking comm in Y)
 #ifndef forceblockingY
-#define nonblockingY
+!#define nonblockingY
 #endif
 ! Force (nxd,nzd) to be at most the product of a
 ! power of 2 and a single factor 3
@@ -18,9 +18,9 @@
 ! half or full channel
 !#define halfchannel
 ! Add a bodyforce 
-!#define bodyforce
-#define BODYFORCE_HEADER "body_forces/am_f1/am_pardec.inc"
-#define BODYFORCE_MODULES "body_forces/am_f1/am_f1.inc"
+#define bodyforce
+#define BODYFORCE_HEADER "body_forces/coriolis/coriolis_pardec.inc"
+#define BODYFORCE_MODULES "body_forces/coriolis/coriolis.inc"
 ! define a bodyforce in space (ibm)
 !#define ibm
 ! Measure per timestep execution time
@@ -37,8 +37,7 @@
 ! exactly with different parallelisations. Useful for 
 ! testing.
 !#define no_optimising_code
-! Files and settings for runtime calculation and disk dump of statistics
-#define runtime_avoid_savefld
+! File for runtime calculation and disk dump of statistics
 #define HEADER_RUNTIME "runtime_plugin/instabudget/header.inc"
 #define RUNTIME_SETUP_SUBROUTINE "runtime_plugin/instabudget/setup.inc"
 #define RUNTIME_FINALISE_SUBROUTINE "runtime_plugin/instabudget/finalise.inc"
