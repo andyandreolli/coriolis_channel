@@ -17,11 +17,11 @@
 ! SHARED ARRAY(0..nx,-nz..nz,nyl-2..nyh+2) OF REAL p
 ! SHARED ARRAY(0..nx,-nz..nz,nyl-2..nyh+2) OF DERIVS gradV
 
-SUBROUTINE compute_pressure(POINTER TO ARRAY(*,*,*) OF DERIVS gradV; POINTER TO ARRAY(*,*,*) OF COMPLEX p) FOLLOWS
+SUBROUTINE compute_pressure(POINTER TO ARRAY(*,*,*) OF DERIVS gradV; POINTER TO ARRAY(*,*,*) OF COMPLEX p; REAL cor_ro_n) FOLLOWS
 
 MODULE poisson
 
-SUBROUTINE compute_pressure(POINTER TO ARRAY(*,*,*) OF DERIVS gradV; POINTER TO ARRAY(*,*,*) OF COMPLEX p)
+SUBROUTINE compute_pressure(POINTER TO ARRAY(*,*,*) OF DERIVS gradV; POINTER TO ARRAY(*,*,*) OF COMPLEX p; REAL cor_ro_n)
 
 ! Both input (V) and output (pressure) are ARRAY(0..nx,-nz..nz,nyl-2..nyh+2) and are defined (globally) outside this subroutine
 ! Velder=grad(V) is also retained as output, since in most postprocessing this is used.
@@ -70,8 +70,10 @@ LOOP FOR iy=nyl-2 TO nyh+2
     DO
       WITH gradVd(*,iz): INLINE LOOP FOR iii IN (ux,uy,uz,vx,vy,vz,wx,wy,wz); RFTU(iii); REPEAT
       DO WITH gradVd(ix,iz):
-        hpd(ix,iz).REAL = 2*(ux.REAL*vy.REAL+vy.REAL*wz.REAL+ux.REAL*wz.REAL-vx.REAL*uy.REAL-wx.REAL*uz.REAL-wy.REAL*vz.REAL)
-        hpd(ix,iz).IMAG = 2*(ux.IMAG*vy.IMAG+vy.IMAG*wz.IMAG+ux.IMAG*wz.IMAG-vx.IMAG*uy.IMAG-wx.IMAG*uz.IMAG-wy.IMAG*vz.IMAG)
+        ! adding cor force to non-linear terms
+        ! sign of hpd is RHS
+        hpd(ix,iz).REAL = 2*(ux.REAL*vy.REAL+vy.REAL*wz.REAL+ux.REAL*wz.REAL-vx.REAL*uy.REAL-wx.REAL*uz.REAL-wy.REAL*vz.REAL) + cor_ro_n*vx.REAL - cor_ro_n*uy.REAL
+        hpd(ix,iz).IMAG = 2*(ux.IMAG*vy.IMAG+vy.IMAG*wz.IMAG+ux.IMAG*wz.IMAG-vx.IMAG*uy.IMAG-wx.IMAG*uz.IMAG-wy.IMAG*vz.IMAG) + cor_ro_n*vx.IMAG - cor_ro_n*uy.IMAG
       FOR ALL ix
       HFTU(hpd(*,iz)) 
     FOR iz=ismp*(HI+1) DIV nsmp TO (ismp+1)*(HI+1) DIV nsmp -1

@@ -20,13 +20,22 @@ REPEAT parse_nsmp
 ! assign constant
 nsmp = tempnsp
 
-
+! get Ro for Coriolis
+REAL cor_ro = 0
+LOOP parse_ro WHILE cntr<=COMMANDLINE.HI ! loop over arguments
+  IF COMMANDLINE(cntr)="--use_coriolis" OR COMMANDLINE(cntr)="-cor" THEN
+    cor_ro = -0.005
+    WRITE "Using Coriolis force - Ro = " cor_ro
+    EXIT parse_ro
+  END IF
+  cntr = cntr+1
+REPEAT parse_ro
 
 ! Parallel - initialization
 INTEGER iproc,nproc
 IF COMMANDLINE.HI<1 THEN iproc=1; nproc=1 ELSE
 iproc=atoi(COMMANDLINE(1)); nproc=atoi(COMMANDLINE(2)); END IF
-bufsize=800; baseport=IPPORT_USERRESERVED+111
+bufsize=0; baseport=IPPORT_USERRESERVED+111
 FILE prev,next
 IF iproc<nproc THEN
   next=fdopen(tcpserver(baseport+iproc),"r+")
@@ -38,6 +47,15 @@ IF iproc>1 THEN
 END IF
 first==(prev=NULL FILE); last==(next=NULL FILE); has_terminal==last
 
+! IF NOT first THEN READ FROM prev
+! IF NOT last THEN WRITE TO next
+! FLUSH(next)
+! WRITE "Check 1 passed!"
+! 
+! IF NOT last THEN READ FROM next
+! IF NOT first THEN WRITE TO prev
+! FLUSH(prev)
+! WRITE "Check 2 passed!"
 
 USE rbmatmod
 

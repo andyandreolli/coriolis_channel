@@ -30,7 +30,7 @@ USE ../poisson
 LOOP files FOR n=nfmin TO nfmax BY dn
   STRING field_name = WRITE('Dati.cart.'n'.out')
   read_field_fortran(field_name)
-  compute_pressure(Vder,pressure)
+  compute_pressure(Vder,pressure,cor_ro)
   STRING pfield_name = WRITE('pField'n'.fld')
   pressuredata = CREATE(pfield_name)
   pressuredata(*,*,*)=pressure(*,*,*)
