@@ -37,7 +37,7 @@ export CNFGSTRNG
 config_file = compiler.settings
 -include ${config_file}
 
-OBJ = typedef.o rbmat.o mpi_transpose.o ffts.o dnsdata.o runtime.o
+OBJ = typedef.o rbmat.o mpi_transpose.o ffts.o dnsdata.o 
 flags = -I$(FFTW_INC) -L$(FFTW_LIB) $(FLAGS)
 libs = -lfftw3
 
@@ -47,9 +47,6 @@ libs = -lfftw3
 # for uiuj (various versions)
 postpro/tke/uiuj_largesmall: flags += -DforceblockingY
 postpro/tke/uiuj_spectra: flags += -DforceblockingY
-
-# for runtime statistics
-runtime: flags += -Druntimestats
 
 postpro/conditional/Velocity_cut: flags += -DforceblockingY
 postpro/conditional/zero_crossings: flags += -DforceblockingY
